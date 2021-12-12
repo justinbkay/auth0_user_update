@@ -1,8 +1,8 @@
 const _ = require("lodash");
 const axios = require("axios").default;
-require("dotenv").config();
+const fs = require("fs");
 
-const users = ["justin.kay@inxpress.com", "justin.olsen@inxpress.com"];
+require("dotenv").config();
 
 const getBearerToken = async () => {
   const response = await axios.post(`${process.env.URL}/oauth/token`, {
@@ -33,8 +33,19 @@ const updateUser = async (config, id) => {
   console.log(response.data);
 };
 
-async function useToken() {
+const readUsers = () => {
+  const users = fs.readFileSync("users.txt", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+  });
+  return users.split("\n");
+};
+
+async function main() {
   const ids = [];
+  const users = readUsers();
 
   getBearerToken().then((token) => {
     const config = {
@@ -57,4 +68,4 @@ async function useToken() {
   });
 }
 
-useToken();
+main();
