@@ -1,5 +1,8 @@
+const _ = require("lodash");
 const axios = require("axios").default;
 require("dotenv").config();
+
+const users = ["justin.kay@inxpress.com", "justin.olsen@inxpress.com"];
 
 const getBearerToken = async () => {
   const response = await axios.post(`${process.env.URL}/oauth/token`, {
@@ -11,14 +14,12 @@ const getBearerToken = async () => {
   return response.data.access_token;
 };
 
-users = ["justin.kay@inxpress.com", "justin.olsen@inxpress.com"];
-
 const getUserId = async (config, email) => {
   response = await axios.get(
     `${process.env.URL}/api/v2/users-by-email?email=${email}`,
     config
   );
-  return response.data[0].user_id;
+  if (!_.isEmpty(response.data)) return response.data[0].user_id;
 };
 
 async function useToken() {
@@ -35,8 +36,9 @@ async function useToken() {
       id = getUserId(config, user);
       ids.push(id);
     });
-    Promise.all(ids).then((values) => {
-      console.log(values);
+    Promise.all(ids).then((userIds) => {
+      const ids = _.compact(userIds);
+      console.log(ids);
     });
   });
 }
