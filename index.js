@@ -22,6 +22,17 @@ const getUserId = async (config, email) => {
   if (!_.isEmpty(response.data)) return response.data[0].user_id;
 };
 
+const updateUser = async (config, id) => {
+  response = await axios.patch(
+    `${process.env.URL}/api/v2/users/${id}`,
+    {
+      user_metadata: { test: "it worked" },
+    },
+    config
+  );
+  console.log(response.data);
+};
+
 async function useToken() {
   const ids = [];
 
@@ -38,6 +49,9 @@ async function useToken() {
     });
     Promise.all(ids).then((userIds) => {
       const ids = _.compact(userIds);
+      ids.forEach(async (id) => {
+        updateUser(config, id);
+      });
       console.log(ids);
     });
   });
