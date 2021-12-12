@@ -1,5 +1,5 @@
 const axios = require("axios").default;
-require('dotenv').config()
+require("dotenv").config();
 
 const getBearerToken = async () => {
   const response = await axios.post(`${process.env.URL}/oauth/token`, {
@@ -11,23 +11,34 @@ const getBearerToken = async () => {
   return response.data.access_token;
 };
 
-function useToken() {
+users = ["justin.kay@inxpress.com", "justin.olsen@inxpress.com"];
+
+const getUserId = async (config, email) => {
+  response = await axios.get(
+    `${process.env.URL}/api/v2/users-by-email?email=${email}`,
+    config
+  );
+  return response.data[0].user_id;
+};
+
+async function useToken() {
+  const ids = [];
+
   getBearerToken().then((token) => {
-    let config = {
+    const config = {
       headers: {
         authorization: `Bearer ${token}`,
       },
     };
-    axios
-      .get(
-        `${process.env.URL}/api/v2/users-by-email?email=justin.kay@inxpress.com`,
-        config
-      )
-      .then(function (response) {
-        console.log(response.data);
-      });
+
+    users.forEach(async (user) => {
+      id = getUserId(config, user);
+      ids.push(id);
+    });
+    Promise.all(ids).then((values) => {
+      console.log(values);
+    });
   });
 }
 
 useToken();
-
